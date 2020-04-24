@@ -7,7 +7,7 @@
     <el-form-item label="转出方" prop="checkPass">
       <el-input type="password" v-model="ruleForm.checkPass" autocomplete="off"></el-input>
     </el-form-item>
-    <el-form-item label="交易密匙" prop="age">
+    <el-form-item label="金额" prop="age">
       <el-input v-model.number="ruleForm.age"></el-input>
     </el-form-item>
     <el-form-item>
