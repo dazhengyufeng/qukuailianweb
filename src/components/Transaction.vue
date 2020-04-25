@@ -1,14 +1,14 @@
 <template>
 <div id="transaction">
   <el-form :model="ruleForm" status-icon :rules="rules" ref="ruleForm" size="mini" label-width="100px" class="demo-ruleForm">
-    <el-form-item label="转入方" prop="pass">
-      <el-input type="password" v-model="ruleForm.pass" autocomplete="off"></el-input>
+    <el-form-item label="发送方" prop="sender">
+      <el-input type="password" v-model="ruleForm.sender" autocomplete="off"></el-input>
     </el-form-item>
-    <el-form-item label="转出方" prop="checkPass">
-      <el-input type="password" v-model="ruleForm.checkPass" autocomplete="off"></el-input>
+    <el-form-item label="接收方" prop="recipient">
+      <el-input type="password" v-model="ruleForm.recipient" autocomplete="off"></el-input>
     </el-form-item>
-    <el-form-item label="金额" prop="age">
-      <el-input v-model.number="ruleForm.age"></el-input>
+    <el-form-item label="金额" prop="amount">
+      <el-input v-model.number="ruleForm.amount"></el-input>
     </el-form-item>
     <el-form-item>
       <el-button type="primary" @click="submitForm('ruleForm')">提交</el-button>
@@ -21,56 +21,21 @@
 <script>
   export default {
     data() {
-      var checkAge = (rule, value, callback) => {
-        if (!value) {
-          return callback(new Error('年龄不能为空'));
-        }
-        setTimeout(() => {
-          if (!Number.isInteger(value)) {
-            callback(new Error('请输入数字值'));
-          } else {
-            if (value < 18) {
-              callback(new Error('必须年满18岁'));
-            } else {
-              callback();
-            }
-          }
-        }, 1000);
-      };
-      var validatePass = (rule, value, callback) => {
-        if (value === '') {
-          callback(new Error('请输入密码'));
-        } else {
-          if (this.ruleForm.checkPass !== '') {
-            this.$refs.ruleForm.validateField('checkPass');
-          }
-          callback();
-        }
-      };
-      var validatePass2 = (rule, value, callback) => {
-        if (value === '') {
-          callback(new Error('请再次输入密码'));
-        } else if (value !== this.ruleForm.pass) {
-          callback(new Error('两次输入密码不一致!'));
-        } else {
-          callback();
-        }
-      };
       return {
         ruleForm: {
-          pass: '',
-          checkPass: '',
-          age: ''
+          sender: '', // 发送方
+          recipient: '', // 接收方
+          amount: '' // 总数
         },
         rules: {
-          pass: [
-            { validator: validatePass, trigger: 'blur' }
+          sender: [
+            { required: true, message: '请填写发送方姓名', trigger: 'blur' }
           ],
-          checkPass: [
-            { validator: validatePass2, trigger: 'blur' }
+          recipient: [
+            { required: true, message: '请填写接收方姓名', trigger: 'blur' }
           ],
-          age: [
-            { validator: checkAge, trigger: 'blur' }
+          amount: [
+            { required: true, message: '请填写金额', trigger: 'blur' }
           ]
         }
       };
@@ -79,7 +44,12 @@
       submitForm(formName) {
         this.$refs[formName].validate((valid) => {
           if (valid) {
-            alert('submit!');
+            let data = {
+              senderId:localStorage.getItem('userId'), // 发送人id
+              sender:this.ruleForm.sender, // 发送人
+              recipient:this.ruleForm.recipient, // 接收人
+              amount:this.ruleForm.amount // 总数
+            }
           } else {
             console.log('error submit!!');
             return false;

@@ -18,10 +18,6 @@
           <el-form-item label="用户名" prop="userName">
             <el-input v-model="ruleForm.userName"></el-input>
           </el-form-item>
-          <!-- 手机号 -->
-          <el-form-item label="手机号" prop="phone">
-            <el-input v-model="ruleForm.phone"></el-input>
-          </el-form-item>
           <!-- 密码 -->
           <el-form-item label="密码" prop="password">
             <el-input v-model="ruleForm.password" type="password"></el-input>
@@ -31,7 +27,7 @@
             <el-input v-model="ruleForm.againPassword" type="password"></el-input>
           </el-form-item>
           <el-form-item>
-            <el-button type="primary" @click="submitForm('ruleForm')">注册</el-button>
+            <el-button type="primary" @click="submitForm('ruleForm')" style="margin-top:20px">注册</el-button>
           </el-form-item>
         </el-form>
       </div>
@@ -40,33 +36,10 @@
 </template>
 
 <script>
-// import code from "../../utils/code";
-// import signApi from "../../api/signApi";
+import api from '../assets/js/api'
 
 export default {
   data() {
-    // 自定义手机号验证
-    var checkPhone = (rule, value, callback) => {
-      if (!value) {
-        return callback(new Error("手机号不能为空"));
-      } else {
-        const reg = /^1[3|4|5|7|8][0-9]\d{8}$/;
-        if (reg.test(value)) {
-          callback();
-        } else {
-          return callback(new Error("请输入正确的手机号"));
-        }
-      }
-    };
-    // 自定义验证码验证
-    const validateCode = (rule, value, callback) => {
-      let res = this.verifyCode.validate(value);
-      if (res) {
-        callback();
-      } else {
-        callback(new Error("验证码错误"));
-      }
-    };
     // 自定义密码验证
     var password = (rule, value, callback) => {
       if (value === "") {
@@ -91,24 +64,14 @@ export default {
     return {
       verifyCode: null,
       ruleForm: {
-        code: "", // 验证码
         userName: "", // 用户名
-        phone: "", // 手机号
-        teamName: "", // 团队编码
         password: "", // 密码
         againPassword: "" // 确认密码
       },
       // 验证规则
       rules: {
-        code: [{ required: true, trigger: "blur", validator: validateCode }],
         userName: [
           { required: true, message: "请输入用户名", trigger: "blur" }
-        ],
-        phone: [
-          { required: true, message: "请输入手机号", validator: checkPhone }
-        ],
-        teamName: [
-          { required: true, message: "请输入团队编码", trigger: "blur" }
         ],
         password: [{ required: true, trigger: "blur", validator: password }],
         againPassword: [
@@ -124,18 +87,20 @@ export default {
         if (valid) {
           let val = {
             password: this.ruleForm.password,
-            phone: this.ruleForm.phone,
-            teamCoding: this.ruleForm.teamName,
             userName: this.ruleForm.userName
           };
           // 注册
-          signApi.signIn(val).then(res => {
+          api.signin(val).then(res => {
+            if(res.data.statusCode == 43001){
+              this.$message.error("用户名已存在");
+              return
+            }
             this.$message({
               message: "账号注册成功",
               type: "success"
             });
             // 跳转到登录页
-            this.$router.push({ path: "/login" });
+            this.$router.push({ path: "/" });
           });
         } else {
           this.$message.error("账号注册失败");
@@ -148,7 +113,6 @@ export default {
     }
   },
   mounted() {
-    // this.verifyCode = new GVerify("v_container");
   }
 };
 </script>
@@ -174,7 +138,7 @@ export default {
     padding-top: 25px;
     box-sizing: border-box;
     width: 580px;
-    height: 520px;
+    height: 430px;
     margin-left: 170px;
     // margin-top: 30px;
     background: #fff;

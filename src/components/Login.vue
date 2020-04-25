@@ -68,6 +68,7 @@
 // import { router, resetRouter } from "../../router/index";
 // import roleMap from "../../router/routerMap";
 // import Router from "vue-router";
+import api from '../assets/js/api'
 
 export default {
   data() {
@@ -116,15 +117,26 @@ export default {
   },
   methods: {
     /**
-     * @author: 周靖松
+     * @author: zyf
      * @information: 点击登陆
      * @Date: 2019-08-21 10:04:25
      */
     handleLogin(loginForm) {
       this.$refs[loginForm].validate((valid) => {
         if (valid) {
-          this.loading = true;
-          this.$router.push({path:'/content/blogTable'})
+          let val = {
+            password: this.loginForm.password,
+            userName: this.loginForm.phone
+          };
+          // 登录
+          api.login(val).then(res => {
+            if(res.data.statusCode == 43001){
+              this.$message.error("用户名密码错误");
+              return
+            }
+            localStorage.setItem('userId',res.data.result.id)
+            this.$router.push({path:'/content/blogTable'})
+          });
         } else {
           console.log('error submit!!');
           return false;
