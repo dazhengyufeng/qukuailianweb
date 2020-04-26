@@ -219,7 +219,7 @@ $light_gray: #eee;
   color: #454545;
 }
 .login {
-  background-image: url("https://img.alicdn.com/tfs/TB1cpTewMHqK1RjSZFEXXcGMXXa-2872-1580.png");
+  background-image: url("https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1587898096917&di=fd1def696ef9077999f6504568e2ff1f&imgtype=0&src=http%3A%2F%2Fpic4.zhimg.com%2Fv2-488a5ec56d8ff7676662b87b9ca63405_1200x500.jpg");
   background-size: 100%;
   min-height: 100%;
   width: 100%;
