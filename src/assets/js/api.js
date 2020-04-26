@@ -12,6 +12,7 @@ export default {
    * @date 2020-02-09
    */
   myWallet(data){
+    console.log(data)
     return axios.post(`/v1/block/myWallet`,data)
   },
    /**
@@ -19,8 +20,8 @@ export default {
    * @information 获取区块链列表
    * @date 2019-11-28
    */
-  getTransaction(data){
-      return axios.post(`/v1/block/getTransaction`,data)
+    getBlockList(){
+      return axios.get(`/v1/block/blockList`)
     },
     /**
    * @author zyf

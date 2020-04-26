@@ -8,7 +8,7 @@
   active-text-color="#ffd04b">
         <el-menu-item index="1">区块列表</el-menu-item>
         <el-menu-item index="2">我的钱包</el-menu-item>
-        <el-menu-item index="3">交易转账</el-menu-item>
+        <el-menu-item index="3">交易</el-menu-item>
       </el-menu>
     </div>
     <router-view/>
@@ -54,5 +54,9 @@ export default {
 <style>
 .el-menu-demo {
   padding-left: 200px;
+}
+.content{
+  width: 100%;
+  height: 80%;
 }
 </style>

@@ -1,7 +1,9 @@
 <template>
-  <div class="contentTable">
+  <div class="contentTable" v-loading="loading" element-loading-text="正在拼了老命的挖矿中，请稍等"
+    element-loading-spinner="el-icon-loading"
+    element-loading-background="rgba(0, 0, 0, 0.8)">
     <!-- 按钮 -->
-    <el-button type="primary" @click="addBill" size='small' class="addBtn">开始挖矿</el-button>
+    <el-button type="primary" @click="mining" size='small' class="addBtn">开始挖矿</el-button>
 
     <!-- 表格 -->
     <div class="table">
@@ -12,43 +14,38 @@
         :header-cell-style="getRowClass"
         highlight-current-row
         style="width: 100%">
+
+        <!-- 索引 -->
         <el-table-column
-          type="index"
+          property="index"
+          label="索引"
           width="50">
         </el-table-column>
+
+        <!-- 上个区块的时间戳 -->
         <el-table-column
-          property="date"
-          label="日期"
-          width="200">
+          property="previousHash"
+          label="上个区块的hash">
         </el-table-column>
+
+        <!-- 时间戳 -->
         <el-table-column
-          property="data"
-          label="内容">
+          property="timestamp"
+          label="时间戳">
+        </el-table-column>
+
+        <!-- 内容 -->
+        <el-table-column
+          property="hash"
+          label="本区块的hash">
         </el-table-column>
       </el-table>
     </div>
-
-    <!-- 记账弹窗 -->
-    <el-dialog
-    title="记录账目内容"
-    :visible.sync="dialogVisible"
-    width="30%"
-    :before-close="handleClose">
-      <el-form :model="form" ref="ruleForm" label-width="100px" class="demo-ruleForm" size="mini">
-        <el-form-item label="账单内容" prop="desc">
-          <el-input type="textarea" v-model="form.content" :limit-length="100"></el-input>
-        </el-form-item>
-        <el-form-item>
-          <el-button type="primary" @click="submitForm()">提交</el-button>
-          <el-button @click="resetForm()">取消</el-button>
-        </el-form-item>
-      </el-form>
-    </el-dialog>
   </div>
 </template>
 
 <script>
-import axios from '../assets/js/axios'
+import api from '../assets/js/api'
 
 export default {
   name: 'HelloWorld',
@@ -60,32 +57,38 @@ export default {
       dialogVisible:false,// 弹窗显示或隐藏
       // 表格内容
       tableData: [],
+      loading:false
     }
   },
+  mounted(){
+    // 获取区块链列表
+    this.selectTable()
+  },
   methods:{
-    // 提交
-    submitForm(){
-      // 提交数据
-      axios.post(`/addBlock`,this.form).then(res => {
+    // 获取区块链
+    selectTable(){
+      // 获取区块链
+      api.getBlockList().then(res => {
         console.log(res)
-        this.tableData = res.data
-        this.dialogVisible = false
-        this.$message({
-          message: '账目添加成功',
-          type: 'success'
-        });
+        this.tableData = res.data.result
       })
     },
-    // 取消
-    resetForm(){
-      this.dialogVisible = false
-    },
-    // 添加账单
-    addBill(){
-      this.dialogVisible = true
-    },
-    handleClose(){
-      this.dialogVisible = false
+    // 挖矿
+    mining(){
+      this.loading = true
+      // 发送人id
+      let data = { userId: localStorage.getItem('userId') }
+      // 挖矿
+      api.mining(data).then(res => {
+        let { count,nonce } = res.data.result
+        this.$notify({
+          title: '提示',
+          message: `恭喜你通过${nonce}次挖矿，获得一个新的区块，并得到${count}BTC的奖励`,
+          duration: 0
+        });
+        this.selectTable()
+        this.loading = false
+      })
     },
     // 表头样式
     getRowClass ({ row, column, rowIndex, columnIndex }) {
@@ -108,6 +111,7 @@ export default {
   }
   .contentTable{
     width: 80%;
+    height: 100%;
     margin: auto;
   }
   .el-button--primary:focus, .el-button--primary:hover{
